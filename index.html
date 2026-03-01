@@ -91,6 +91,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Sheet ID</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Expiry Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Package Price</th>
                                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Actions</th>
                                 </tr>
                             </thead>
@@ -119,6 +120,7 @@
             <form id="add-client-form" class="space-y-4">
                 <div><label class="block text-sm font-medium text-gray-700">Client Name</label><input type="text" id="add-name" required class="mt-1 w-full border rounded-lg px-3 py-2"></div>
                 <div><label class="block text-sm font-medium text-gray-700">Sheet ID</label><input type="text" id="add-sheetid" required class="mt-1 w-full border rounded-lg px-3 py-2"></div>
+                <div><label class="block text-sm font-medium text-gray-700">Package Price</label><input type="number" id="add-price" required class="mt-1 w-full border rounded-lg px-3 py-2"></div>
                 <div><label class="block text-sm font-medium text-gray-700">Expiry Date</label><input type="date" id="add-expiry" required class="mt-1 w-full border rounded-lg px-3 py-2"></div>
                 <div><label class="block text-sm font-medium text-gray-700">Status</label><select id="add-status" class="mt-1 w-full border rounded-lg px-3 py-2"><option value="Active">Active</option><option value="Expired">Expired</option><option value="Pending">Pending</option></select></div>
                 <div class="flex justify-end gap-3 mt-6">
@@ -134,6 +136,7 @@
             <h3 class="text-lg font-bold text-gray-900 mb-4">Edit Client <span id="edit-client-name" class="text-blue-600"></span></h3>
             <form id="edit-client-form" class="space-y-4">
                 <input type="hidden" id="edit-row">
+                <div><label class="block text-sm font-medium text-gray-700">Package Price</label><input type="number" id="edit-price" required class="mt-1 w-full border rounded-lg px-3 py-2"></div>
                 <div><label class="block text-sm font-medium text-gray-700">Expiry Date</label><input type="date" id="edit-expiry" required class="mt-1 w-full border rounded-lg px-3 py-2"></div>
                 <div><label class="block text-sm font-medium text-gray-700">Status</label><select id="edit-status" class="mt-1 w-full border rounded-lg px-3 py-2"><option value="Active">Active</option><option value="Expired">Expired</option><option value="Pending">Pending</option></select></div>
                 <div class="flex justify-end gap-3 mt-6">
@@ -262,8 +265,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">${c.sheetId.substring(0,10)}...</td>
                             <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 py-1 text-xs font-bold rounded-full border ${statusColor}">${c.status}</span></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${c.expiryDate}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700">${c.packagePrice || '0'} Tk</td>
                             <td class="px-6 py-4 whitespace-nowrap text-center flex justify-center gap-2">
-                                <button onclick="openEditModal(${i}, '${isoDate}', '${c.status}')" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md font-semibold transition">Edit</button>
+                                <button onclick="openEditModal(${i}, '${isoDate}', '${c.status}', '${c.packagePrice || 0}')" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md font-semibold transition">Edit</button>
                                 <button onclick="openDeleteModal(${i})" class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md font-semibold transition">Delete</button>
                             </td>
                         </tr>
@@ -281,6 +285,7 @@
             const payload = {
                 username: document.getElementById('add-name').value,
                 sheetId: document.getElementById('add-sheetid').value,
+                packagePrice: document.getElementById('add-price').value,
                 expiryDate: document.getElementById('add-expiry').value,
                 status: document.getElementById('add-status').value
             };
@@ -304,6 +309,7 @@
             
             const payload = {
                 rowIdx: document.getElementById('edit-row').value,
+                packagePrice: document.getElementById('edit-price').value,
                 expiryDate: document.getElementById('edit-expiry').value,
                 status: document.getElementById('edit-status').value
             };
@@ -343,7 +349,7 @@
             } catch(e) { btn.innerHTML = orig; btn.disabled = false; }
         }
 
-        function openEditModal(index, dateStr, status) {
+        function openEditModal(index, dateStr, status, price) {
             const client = ALL_CLIENTS[index];
             document.getElementById('edit-client-name').innerText = client.username;
             document.getElementById('edit-row').value = client.rowIdx;
@@ -356,6 +362,7 @@
             }
             document.getElementById('edit-expiry').value = formattedDate;
             document.getElementById('edit-status').value = status;
+            document.getElementById('edit-price').value = price;
             openModal('edit-client-modal', 'edit-panel');
         }
 
